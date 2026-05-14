@@ -33,13 +33,10 @@ This project demonstrates the following production-ready skills:
 ---
 
 ## Architecture
+<img width="1536" height="1024" alt="GitOps architecture overview infographic" src="https://github.com/user-attachments/assets/7fc8f37c-0f99-4cc6-94fc-c2fb80e542e3" />
 
-```
-<img width="1536" height="1024" alt="GitOps architecture overview infographic" src="https://github.com/user-attachments/assets/78fe85fa-4e85-419b-a199-c661eae77085" />
 
-```
 
----
 
 ## Repository Structure
 
