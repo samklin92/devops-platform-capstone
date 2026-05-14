@@ -1,281 +1,300 @@
-# DevOps Platform Capstone
-### Terraform · ArgoCD · Kubernetes · GitOps · Progressive Delivery
+# Sentinel GitOps Platform 🚀
 
-> **Engineer:** Ogaji Igwe Samuel 
-> **Completed:** April 2026  
-> **Repo:** devops-platform-capstone  
+Production-grade multi-cluster Kubernetes platform built on AWS using Terraform, ArgoCD, GitOps, and progressive delivery.
 
----
-
-## What This Is
-
-A production-grade DevOps platform built entirely from scratch on real AWS infrastructure. No sandboxes. No guided labs. Every resource provisioned, broken, debugged, and destroyed on a live AWS account across a four-phase self-directed engineering program.
-
-This capstone project is the culmination of that program — all three phases working together as one unified, fully automated platform.
+Designed and engineered by Ogaji Igwe Samuel.
 
 ---
 
-## What a Recruiter Should Know
+# What This Project Is
 
-This project demonstrates the following production-ready skills:
+Sentinel GitOps Platform is a real-world DevOps and platform engineering project built entirely on live AWS infrastructure.
 
-| Skill | Evidence |
-|-------|---------|
-| Infrastructure as Code | Two EKS clusters, two VPCs, IAM roles provisioned by one Terraform config |
-| Remote state management | S3 + DynamoDB locking — state isolated per project, versioned, encrypted |
-| GitOps delivery | Zero `kubectl apply` — all deployments driven by git push |
-| Multi-environment config | Dev, staging, prod from one Kustomize base — DRY principle applied |
-| Multi-cluster management | ArgoCD on management cluster driving workload cluster |
-| Progressive delivery | Argo Rollouts canary — 20% → 50% → 100% traffic shift |
-| Secrets management | ESO + AWS Secrets Manager — secrets never touch Git |
-| Troubleshooting | State locks, corrupted state, broken backends, cluster misconfigs — all recovered |
+The platform demonstrates how modern engineering teams automate infrastructure provisioning, application delivery, environment management, secrets handling, and progressive deployments across multiple Kubernetes clusters using GitOps principles.
+
+Every component was provisioned, configured, debugged, and destroyed manually during a multi-phase self-directed engineering program.
+
+No guided labs. No sandbox environments. Real infrastructure. Real troubleshooting.
 
 ---
 
-## Architecture
-<img width="1536" height="1024" alt="GitOps architecture overview infographic" src="https://github.com/user-attachments/assets/7fc8f37c-0f99-4cc6-94fc-c2fb80e542e3" />
+# Core Features
+
+✅ Multi-cluster Amazon EKS architecture  
+✅ Infrastructure as Code with Terraform  
+✅ Remote Terraform state with S3 + DynamoDB locking  
+✅ GitOps delivery with ArgoCD  
+✅ Kustomize multi-environment overlays  
+✅ Progressive delivery with Argo Rollouts  
+✅ Canary deployments (20% → 50% → 100%)  
+✅ Cross-cluster application deployment  
+✅ Secrets management with ESO + AWS Secrets Manager  
+✅ Self-healing Kubernetes workloads  
+✅ Fully automated deployment workflows  
+
+---
+
+# Platform Architecture
+<img width="1536" height="1024" alt="GitOps architecture overview infographic" src="https://github.com/user-attachments/assets/4ab3514c-c36d-4798-8990-119419a696e3" />
 
 
 
+# What This Demonstrates
 
-## Repository Structure
+| Capability | Implementation |
+|---|---|
+| Infrastructure as Code | Terraform-provisioned EKS clusters and VPCs |
+| GitOps | ArgoCD-driven deployments from Git |
+| Multi-environment delivery | Dev, staging, prod via Kustomize overlays |
+| Multi-cluster operations | Management cluster controlling workload cluster |
+| Progressive delivery | Canary rollout strategy with Argo Rollouts |
+| Secrets management | ESO syncing from AWS Secrets Manager |
+| Remote Terraform state | S3 backend with DynamoDB locking |
+| Kubernetes operations | Automated reconciliation and self-healing |
+| Troubleshooting | Real AWS, Terraform, Kubernetes recovery scenarios |
 
-```
-devops-platform-capstone/
-├── README.md
+---
+
+# Repository Structure
+
+```text
+sentinel-gitops-platform/
+│
 ├── apps/
-│   ├── appset.yaml              ← ApplicationSet — 1 template, 3 apps
-│   ├── base/                    ← shared Kubernetes manifests
+│   ├── appset.yaml
+│   ├── base/
 │   │   ├── deployment.yaml
 │   │   ├── service.yaml
 │   │   ├── namespace.yaml
 │   │   └── kustomization.yaml
+│   │
 │   ├── overlays/
-│   │   ├── dev/                 ← replicas: 2 · namespace: myapp-dev
-│   │   │   ├── kustomization.yaml
-│   │   │   └── external-secret.yaml
-│   │   ├── staging/             ← replicas: 3 · namespace: myapp-staging
-│   │   │   └── kustomization.yaml
-│   │   └── prod/                ← replicas: 5 · namespace: myapp-prod
-│   │       └── kustomization.yaml
+│   │   ├── dev/
+│   │   ├── staging/
+│   │   └── prod/
+│   │
 │   └── rollouts/
-│       └── workload/            ← Argo Rollouts canary config
-│           ├── namespace.yaml
-│           ├── rollout.yaml
-│           ├── service-stable.yaml
-│           ├── service-canary.yaml
-│           └── kustomization.yaml
-└── bootstrap/
-    ├── argocd-install.sh
-    └── register-clusters.sh
+│       └── workload/
+│
+├── bootstrap/
+│   ├── argocd-install.sh
+│   └── register-clusters.sh
+│
+└── README.md
 ```
 
 ---
 
-## The Full Delivery Flow
+# Deployment Workflow
 
-```
+```text
 git push
-  → ArgoCD detects change (webhook / 3min poll)
-    → Repo server clones repo
-      → Kustomize builds base + overlay
-        → App controller compares desired vs live state
-          → Applies diff to target cluster
-            → Argo Rollouts manages canary traffic split
-              → 20% new version → pause 30s
-              → 50% new version → pause 30s
-              → 100% new version → old pods terminate
-                → Health: Healthy · Sync: Synced
+   ↓
+ArgoCD detects repository change
+   ↓
+Repo Server clones repository
+   ↓
+Kustomize renders manifests
+   ↓
+Application Controller compares desired vs live state
+   ↓
+Changes applied to target cluster
+   ↓
+Argo Rollouts performs canary deployment
+   ↓
+20% → 50% → 100% traffic shift
+   ↓
+Healthy + Synced
+```
 
-Total time from git push to running pods: 30-60 seconds
+Average deployment time:
+
+```text
+30–60 seconds from commit to running pods
 ```
 
 ---
 
-## Kustomize — DRY Multi-Environment Config
-
-```
-apps/base/          ← written once
-  deployment.yaml   ← image: nginx:1.25
-  service.yaml
-  namespace.yaml
-
-apps/overlays/dev/  ← only what differs
-  namespace: myapp-dev
-  replicas: 2
-
-apps/overlays/staging/
-  namespace: myapp-staging
-  replicas: 3
-
-apps/overlays/prod/
-  namespace: myapp-prod
-  replicas: 5
-```
-
-Change the base image → all three environments update from one commit.
-
----
-
-## Canary Rollout Strategy
+# Canary Delivery Strategy
 
 ```yaml
 strategy:
   canary:
     steps:
-      - setWeight: 20       # 20% traffic to new version
+      - setWeight: 20
       - pause: {duration: 30s}
-      - setWeight: 50       # 50% traffic to new version
+
+      - setWeight: 50
       - pause: {duration: 30s}
-      - setWeight: 100      # 100% — old pods terminate
-    canaryService: myapp-canary
-    stableService: myapp-stable
+
+      - setWeight: 100
 ```
 
-Triggered by a single `git push`. Abort at any step to roll back instantly.
+Deployments can be promoted, paused, or rolled back instantly.
 
 ---
 
-## Secrets Management
+# Secrets Management
 
-```
-Git                    ESO                    Cluster
-───                    ───                    ───────
-ExternalSecret    →    reads AWS SM    →    K8s Secret (auto)
-(no values)            every 1 hour          password: ***
-                                             username: myapp
+```text
+Git Repository
+      ↓
+ExternalSecret Resource
+      ↓
+External Secrets Operator
+      ↓
+AWS Secrets Manager
+      ↓
+Kubernetes Secret
 ```
 
-The actual secret values live exclusively in AWS Secrets Manager.
-The `ExternalSecret` resource in Git contains only a reference — never a value.
+Sensitive values never exist inside Git repositories.
 
 ---
 
-## Infrastructure Specs
+# Infrastructure Specifications
 
 | Resource | Management Cluster | Workload Cluster |
-|----------|-------------------|-----------------|
-| Name | capstone-prod-management | capstone-prod-workload |
-| Kubernetes | v1.31.14-eks-f69f56f | v1.31.14-eks-f69f56f |
+|---|---|---|
+| Platform | Amazon EKS | Amazon EKS |
+| Kubernetes Version | v1.31 | v1.31 |
 | VPC CIDR | 10.0.0.0/16 | 10.1.0.0/16 |
-| Nodes | 2x t3.medium | 2x t3.medium |
-| What runs here | ArgoCD, 3 app envs | myapp-prod, Argo Rollouts |
-
-Both clusters provisioned by one Terraform config using `for_each`.
+| Nodes | 2 × t3.medium | 2 × t3.medium |
+| Purpose | ArgoCD + environments | Production workloads |
 
 ---
 
-## Terraform State Structure
+# Operational Capabilities Proven
 
-```
-myapp-terraform-state-109804294707/ (S3)
-├── backend/terraform.tfstate
-├── capstone/terraform.tfstate
-├── phase3/terraform.tfstate
-├── eks/terraform.tfstate
-└── environments/
-    ├── dev/terraform.tfstate
-    └── prod/terraform.tfstate
-```
-
-One S3 bucket. Every project isolated by key path. One DynamoDB table locks them all.
+| Operation | Result |
+|---|---|
+| Git push deployment | Fully automated delivery |
+| Self-healing | ArgoCD restored manual changes |
+| Rolling updates | Zero-downtime deployments |
+| Rollbacks | Git revert restored previous version |
+| Canary deployments | Progressive traffic shifting |
+| Cross-cluster deployment | Remote workload synchronization |
+| Secret synchronization | ESO created Kubernetes secrets automatically |
 
 ---
 
-## Operations Proven
+# Troubleshooting Experience
 
-| Operation | Trigger | Result |
-|-----------|---------|--------|
-| Zero-touch deploy | git push | Pods created — no kubectl apply |
-| Git-driven scaling | Change replicas in overlay | Synced in 60 seconds |
-| Self-healing | kubectl scale to 1 manually | ArgoCD restored to configured count |
-| Rolling update | Change image tag in Git | Zero-downtime rolling update |
-| Rollback | Revert commit in Git | Instant — no special commands |
-| Canary delivery | git push new image | 20%→50%→100% traffic shift |
-| Cross-cluster deploy | ArgoCD app targeting workload | Pods on separate cluster, separate VPC |
-| Secret sync | ExternalSecret in Git | K8s Secret auto-created from AWS SM |
+This platform was built and debugged on live AWS infrastructure.
 
----
+Real issues resolved include:
 
-## Troubleshooting Experience
-
-Real errors encountered and resolved during this program:
-
-- Recovered from stale DynamoDB state locks after system interruption
-- Diagnosed Windows Application Control (AppLocker vs WDAC vs Smart App Control)
-- Used `terraform state mv` to refactor live resources — zero downtime
-- Emptied versioned S3 buckets via AWS CLI when Terraform destroy failed
-- Fixed `yes-dev-cluster` — typed `yes` as project name at variable prompt
-- Recovered from corrupted `deployment.yaml` after Kustomize content injection
-- Fixed ESO `ClusterSecretStore` using `v1` API after `v1beta1` was rejected
-- Resolved `<workload-cluster-endpoint>` placeholder error in ArgoCD app create
-- Fixed ApplicationSet CRD with `--server-side` flag after annotation size limit
+- Terraform state lock recovery
+- Corrupted Terraform state repair
+- Cross-cluster connectivity issues
+- ArgoCD synchronization failures
+- Kustomize rendering conflicts
+- ESO API version incompatibilities
+- Kubernetes deployment recovery
+- ApplicationSet CRD annotation limits
+- AWS backend cleanup and recovery
 
 ---
 
-## Key Commands
+# Key Commands
+
+## Terraform
 
 ```bash
-# Terraform
-terraform init && terraform plan && terraform apply
+terraform init
+terraform plan
+terraform apply
 terraform state list
-terraform state mv <old> <new>
 terraform force-unlock <lock-id>
-terraform output cluster_endpoints
+```
 
-# kubectl multi-cluster
+## Kubernetes
+
+```bash
 kubectl config get-contexts
 kubectl config use-context management
 kubectl config use-context workload
-kubectl get pods -n <ns> --context=workload
+```
 
-# ArgoCD
-argocd cluster add workload --name workload-cluster
+## ArgoCD
+
+```bash
 argocd app list
-argocd app get myapp-canary
-argocd app history myapp-dev
+argocd app get myapp-dev
 argocd app rollback myapp-dev <id>
+```
 
-# Argo Rollouts
-kubectl argo rollouts get rollout myapp -n myapp-canary --context=workload --watch
-kubectl argo rollouts promote myapp -n myapp-canary --context=workload
-kubectl argo rollouts abort myapp -n myapp-canary --context=workload
+## Argo Rollouts
+
+```bash
+kubectl argo rollouts get rollout myapp
+kubectl argo rollouts promote myapp
+kubectl argo rollouts abort myapp
 ```
 
 ---
 
-## Cost Reference
+# Cost Awareness
 
-| Resource | Cost |
-|----------|------|
-| EKS control plane | $0.10/hour per cluster |
+| Resource | Approximate Cost |
+|---|---|
+| EKS control plane | $0.10/hour |
 | t3.medium node | $0.0416/hour |
-| Two clusters total | ~$8-10/day |
+| Two-cluster environment | ~$8–10/day |
 
-**All infrastructure in this portfolio was destroyed after every session. Zero ongoing AWS charges.**
-
----
-
-## Learning Journey
-
-```
-Phase 1 — Terraform IaC
-  HCL syntax · variables · modules · remote state · EKS · multi-env
-
-Phase 2 — ArgoCD & GitOps
-  GitOps model · Kustomize · ApplicationSet · self-healing · ESO
-
-Phase 3 — Multi-cluster Kubernetes
-  Hub + spoke · cross-cluster GitOps · Argo Rollouts · canary delivery
-
-Capstone — Full platform
-  Everything above working together as one unified platform
-```
-
-Started unable to run `terraform.exe` due to Windows Application Control.  
-Finished managing a multi-cluster Kubernetes fleet with progressive delivery.
+All infrastructure was destroyed after each session to avoid unnecessary AWS charges.
 
 ---
 
-*Built on real AWS infrastructure · All resources destroyed after every session*  
-*GitHub: https://github.com/samklin92/devops-platform-capstone*
+# Engineering Journey
+
+## Phase 1 — Terraform & Infrastructure as Code
+- Remote state
+- EKS provisioning
+- Multi-environment infrastructure
+
+## Phase 2 — GitOps & Kubernetes Operations
+- ArgoCD
+- Kustomize
+- ApplicationSets
+- Self-healing deployments
+
+## Phase 3 — Multi-Cluster Delivery
+- Cross-cluster GitOps
+- Argo Rollouts
+- Progressive delivery
+- Canary deployments
+
+## Capstone Platform
+All systems integrated into one production-style delivery platform.
+
+---
+
+# Key Lessons Learned
+
+- GitOps simplifies operational consistency
+- Infrastructure automation reduces deployment risk
+- Progressive delivery improves deployment safety
+- Multi-cluster systems require operational discipline
+- Troubleshooting is one of the most valuable engineering skills
+
+---
+
+# Author
+
+## 👨‍💻 Ogaji Igwe Samuel
+
+GitHub: https://github.com/samklin92
+
+LinkedIn: https://linkedin.com/in/samklin92
+
+Repository:
+https://github.com/samklin92/sentinel-gitops-platform
+
+---
+
+# Final Note
+
+This project represents a complete production-style GitOps platform engineered from the ground up using AWS, Kubernetes, Terraform, ArgoCD, and progressive delivery workflows.
+
+Built on real infrastructure. Debugged through real failures. Operated like a real platform.
