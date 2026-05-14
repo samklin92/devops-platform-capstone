@@ -35,38 +35,8 @@ This project demonstrates the following production-ready skills:
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Developer                                                  │
-│  git push → GitHub (devops-platform-capstone)               │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ webhook
-┌──────────────────────────▼──────────────────────────────────┐
-│  Management Cluster  (EKS · VPC 10.0.0.0/16)               │
-│                                                             │
-│  ArgoCD control plane                                       │
-│  ├── App controller  (reconciliation loop)                  │
-│  ├── Repo server     (clones + renders Kustomize)           │
-│  ├── ArgoCD server   (UI + CLI + API)                       │
-│  └── ApplicationSet  (one template → dev, staging, prod)   │
-│                                                             │
-│  myapp-dev      (2 pods · nginx:1.25 · Synced · Healthy)   │
-│  myapp-staging  (3 pods · nginx:1.25 · Synced · Healthy)   │
-│  myapp-prod     (5 pods · nginx:1.25 · Synced · Healthy)   │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ cross-cluster GitOps
-┌──────────────────────────▼──────────────────────────────────┐
-│  Workload Cluster  (EKS · VPC 10.1.0.0/16)                 │
-│                                                             │
-│  Argo Rollouts controller                                   │
-│  myapp-prod     (5 pods · deployed by ArgoCD remotely)      │
-│  myapp-canary   (Rollout · canary 20%→50%→100%)            │
-└─────────────────────────────────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────┐
-│  AWS Services                                               │
-│  Secrets Manager  →  ESO  →  Kubernetes Secret (auto)      │
-│  S3 + DynamoDB    →  Remote state + locking                 │
-└─────────────────────────────────────────────────────────────┘
+<img width="1536" height="1024" alt="GitOps architecture overview infographic" src="https://github.com/user-attachments/assets/78fe85fa-4e85-419b-a199-c661eae77085" />
+
 ```
 
 ---
